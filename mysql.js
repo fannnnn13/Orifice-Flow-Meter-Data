@@ -1,30 +1,37 @@
-const express = require('express');
+const express = require("express");
+const mysql = require("mysql");
+const cors = require("cors"); // Allowing CORS for fetch requests
+
 const app = express();
 const port = 1111;
 
-// Koneksi ke database
-// (Contoh saja, pastikan Anda sudah mengonfigurasi koneksi database MySQL)
-const mysql = require('mysql');
+// Allow CORS (for frontend to access backend)
+app.use(cors());
+
+// MySQL connection
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'sensor'
+    host: "localhost",
+    user: "root",
+    password: "", // Use your MySQL password here
+    database: "sensor",
 });
 
 connection.connect((err) => {
     if (err) {
-        console.error('Error connecting to MySQL:', err.stack);
+        console.error("Error connecting to MySQL:", err.stack);
         return;
     }
-    console.log('Connected to MySQL as id ' + connection.threadId);
+    console.log("Connected to MySQL as id " + connection.threadId);
 });
 
-app.get('/data', (req, res) => {
-    connection.query('SELECT * FROM sensor', (err, results) => {
+// Fetch data from MySQL
+app.get("/data", (req, res) => {
+    const query = "SELECT * FROM sensor";
+
+    connection.query(query, (err, results) => {
         if (err) {
-            console.error('Error executing query:', err.stack);
-            res.status(500).send('Error fetching data from database.');
+            console.error("Error executing query:", err.stack);
+            res.status(500).send("Error fetching data from database.");
             return;
         }
         res.json(results);
@@ -32,5 +39,5 @@ app.get('/data', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server berjalan di http://127.0.0.1:${port}`);
+    console.log(`Server is running at http://127.0.0.1:${port}`);
 });
